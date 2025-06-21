@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: proxyO
+    name: attend_system
     env: node
     plan: free
-    buildCommand: pnpm build
+    buildCommand: pnpm install --shamefully-hoist && pnpm build
     startCommand: pnpm start
     nodeVersion: 22.16.0
     envVars:
@@ -12,6 +12,6 @@ services:
       - key: PNPM_FLAGS
         value: --shamefully-hoist
       - key: DATABASE_URL
-        sync: false # Set in Render dashboard
+        sync: false
       - key: JWT_SECRET
-        sync: false # Set in Render dashboard
+        sync: false
