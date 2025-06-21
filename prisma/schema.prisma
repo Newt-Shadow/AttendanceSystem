@@ -18,7 +18,7 @@ model User {
   createdAt             DateTime            @default(now())
   name                  String
   email                 String              @unique
-  password              String // hashed (bcrypt)
+  password              String
   role                  Role
   department            Department?         @relation("UserDepartment", fields: [departmentId], references: [id])
   departmentId          Int?
@@ -38,6 +38,8 @@ model User {
 model Department {
   id       Int       @id @default(autoincrement())
   name     String
+  lat      Float
+  lon      Float
   subjects Subject[]
   teachers User[]    @relation("DeptTeachers")
   students User[]    @relation("DeptStudents")
@@ -84,7 +86,7 @@ model AttendanceRecord {
   sessionId    Int
   checkInTime  DateTime?         @default(now())
   checkOutTime DateTime?
-  method       String // e.g. "geofence" or "manual"
+  method       String
   lat          Float?
   lng          Float?
 }

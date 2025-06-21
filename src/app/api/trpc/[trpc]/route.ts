@@ -1,34 +1,42 @@
+// import { fetchRequestHandler } from "@trpc/server/adapters/next";
+// import { appRouter } from "~/server/api/routers";
+// import { createContext } from "~/server/api/context";
+
+// export const runtime = "edge";
+
+// export async function GET(req: Request) {
+//   return fetchRequestHandler({
+//     endpoint: "/api/trpc",
+//     req,
+//     router: appRouter,
+//     createContext: () => createContext({ req: req as any }),
+//   });
+// }
+
+// export async function POST(req: Request) {
+//   return fetchRequestHandler({
+//     endpoint: "/api/trpc",
+//     req,
+//     router: appRouter,
+//     createContext: () => createContext({ req: req as any }),
+//   });
+// }
+
+// app/api/trpc/route.ts
+
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { type NextRequest } from "next/server";
+import { appRouter } from "~/server/api/routers";
+import { createContext } from "~/server/api/context";
 
-import { env } from "~/env";
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
+export const runtime = "edge"; // ensures use of Edge runtime
 
-/**
- * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
- * handling a HTTP request (e.g. when you make requests from Client Components).
- */
-const createContext = async (req: NextRequest) => {
-  return createTRPCContext({
-    headers: req.headers,
-  });
-};
-
-const handler = (req: NextRequest) =>
+const handler = (req: Request) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
     router: appRouter,
-    createContext: () => createContext(req),
-    onError:
-      env.NODE_ENV === "development"
-        ? ({ path, error }) => {
-            console.error(
-              `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,
-            );
-          }
-        : undefined,
+    createContext: () => createContext({req: req as any}),
   });
 
+// Combine GET and POST handlers using the same handler
 export { handler as GET, handler as POST };
