@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model User {
+  id                    Int                 @id @default(autoincrement())
+  createdAt             DateTime            @default(now())
+  name                  String
+  email                 String              @unique
+  password              String // hashed (bcrypt)
+  role                  Role
+  department            Department?         @relation("UserDepartment", fields: [departmentId], references: [id])
+  departmentId          Int?
+  semester              Semester?           @relation("UserSemester", fields: [semesterId], references: [id])
+  semesterId            Int?
+  teachingSubjects      Subject[]           @relation("TeacherSubjects")
+  attendanceRecords     AttendanceRecord[]  @relation("StudentAttendance")
+  departmentAsTeacher   Department?         @relation("DeptTeachers", fields: [departmentAsTeacherId], references: [id])
+  departmentAsTeacherId Int?
+  departmentAsStudent   Department?         @relation("DeptStudents", fields: [departmentAsStudentId], references: [id])
+  departmentAsStudentId Int?
+  semesterAsStudent     Semester?           @relation("SemesterStudents", fields: [semesterAsStudentId], references: [id])
+  semesterAsStudentId   Int?
+  teachingSessions      AttendanceSession[] @relation("TeacherSessions")
+}
+
+model Department {
+  id       Int       @id @default(autoincrement())
+  name     String
+  subjects Subject[]
+  teachers User[]    @relation("DeptTeachers")
+  students User[]    @relation("DeptStudents")
+  users    User[]    @relation("UserDepartment")
+}
+
+model Semester {
+  id       Int       @id @default(autoincrement())
+  name     String
+  subjects Subject[]
+  students User[]    @relation("SemesterStudents")
+  users    User[]    @relation("UserSemester")
+}
+
+model Subject {
+  id           Int                 @id @default(autoincrement())
+  name         String
+  department   Department          @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  semester     Semester?           @relation(fields: [semesterId], references: [id])
+  semesterId   Int?
+  teacher      User                @relation("TeacherSubjects", fields: [teacherId], references: [id])
+  teacherId    Int
+  sessions     AttendanceSession[]
+}
+
+model AttendanceSession {
+  id        Int                @id @default(autoincrement())
+  code      String             @unique
+  createdAt DateTime           @default(now())
+  expiresAt DateTime
+  subject   Subject            @relation(fields: [subjectId], references: [id])
+  subjectId Int
+  teacher   User               @relation("TeacherSessions", fields: [teacherId], references: [id])
+  teacherId Int
+  records   AttendanceRecord[]
+}
+
+model AttendanceRecord {
+  id           Int               @id @default(autoincrement())
+  student      User              @relation("StudentAttendance", fields: [studentId], references: [id])
+  studentId    Int
+  session      AttendanceSession @relation(fields: [sessionId], references: [id])
+  sessionId    Int
+  checkInTime  DateTime?         @default(now())
+  checkOutTime DateTime?
+  method       String // e.g. "geofence" or "manual"
+  lat          Float?
+  lng          Float?
+}
