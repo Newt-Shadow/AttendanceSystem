@@ -1,5 +1,5 @@
+
 "use client";
-import { Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Link from "next/link";
 
 export function Sidebar({ role }: { role: string }) {
@@ -20,25 +20,59 @@ export function Sidebar({ role }: { role: string }) {
   }[role] || [];
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 240,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": { width: 240, boxSizing: "border-box" },
-      }}
-    >
-      <List>
-        {links.map((link) => (
-          <ListItem key={link.href} disablePadding>
-            <Link href={link.href} passHref legacyBehavior>
-              <ListItemButton component="a">
-                <ListItemText primary={link.name} />
-              </ListItemButton>
-            </Link>
-          </ListItem>
-        ))}
-      </List>
-    </Drawer>
+    <>
+      <style jsx>{`
+        .sidebar {
+          font-family: 'Roboto', sans-serif;
+          width: 240px;
+          background-color: #fff;
+          border-right: 1px solid #e0e0e0;
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          z-index: 1200;
+          box-sizing: border-box;
+          overflow-y: auto;
+        }
+
+        .list {
+          padding: 8px 0;
+          margin: 0;
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .list-item {
+          padding: 0;
+        }
+
+        .list-item-link {
+          display: block;
+          padding: 8px 16px;
+          color: rgba(0, 0, 0, 0.87);
+          font-size: 0.875rem;
+          font-weight: 400;
+          text-decoration: none;
+          transition: background-color 0.2s;
+        }
+
+        .list-item-link:hover {
+          background-color: #f5f5f5;
+        }
+      `}</style>
+      <aside className="sidebar">
+        <ul className="list">
+          {links.map((link) => (
+            <li key={link.href} className="list-item">
+              <Link href={link.href} className="list-item-link">
+                <span>{link.name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </>
   );
 }

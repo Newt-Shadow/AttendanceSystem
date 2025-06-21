@@ -10,12 +10,20 @@ export async function login(email: string, password: string) {
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) throw new Error("Invalid password");
   const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
+  console.log("Login attempt:", email);
+if (!user) {
+  console.log("No user found.");
+  throw new Error("User not found");
+}
+console.log("User found, checking password...");
   return { token, user };
+  
 }
 
 export async function verifyToken(token: string) {
   try {
     return jwt.verify(token, JWT_SECRET) as { id: number; role: string };
+    
   } catch {
     throw new Error("Invalid token");
   }

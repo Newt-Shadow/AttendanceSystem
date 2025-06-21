@@ -4,6 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "~/styles/theme";
 import { Header } from "~/app/_components/Header";
+import { TRPCReactProvider } from "~/trpc/react"; // <-- Add this
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,11 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Header />
-          <main className="container mx-auto p-4">{children}</main>
-        </ThemeProvider>
+      
+          <TRPCReactProvider>
+            <Header />
+            <main className="container mx-auto p-4">{children}</main>
+          </TRPCReactProvider>
+     
       </body>
     </html>
   );
