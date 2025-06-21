@@ -6,7 +6,6 @@ services:
     buildCommand: pnpm install --shamefully-hoist && pnpm build
     startCommand: pnpm start
     nodeVersion: 22.16.0
-    preDeployCommand: pnpm db:migrate
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,13 +13,5 @@ services:
         value: --shamefully-hoist
       - key: DATABASE_URL
         sync: false
-      - key: DIRECT_URL
-        sync: false
       - key: JWT_SECRET
-        sync: false
-      - key: IPAPI_KEY
-        sync: false
-      - key: NEXT_PUBLIC_OFFICE_LAT
-        sync: false
-      - key: NEXT_PUBLIC_OFFICE_LNG
         sync: false
