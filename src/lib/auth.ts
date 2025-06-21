@@ -1,34 +1,56 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { db } from "~/server/db";
+// import jwt from 'jsonwebtoken';
+// import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+// export function getUser() {
+//   const token = cookies().get('token')?.value;
+//   if (!token) return null;
 
-export async function login(email: string, password: string) {
-  const user = await db.user.findUnique({ where: { email } });
-  if (!user) throw new Error("User not found");
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) throw new Error("Invalid password");
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
-  console.log("Login attempt:", email);
-if (!user) {
-  console.log("No user found.");
-  throw new Error("User not found");
+//   try {
+//     return jwt.verify(token, process.env.JWT_SECRET!) as { id: number; role: string };
+//   } catch {
+//     return null;
+//   }
+// }
+// lib/auth.ts
+import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export interface User {
+  id: number;
+  role: 'STUDENT' | 'TEACHER' | 'ADMIN';
+  semesterId?: number;
+  semesterAsStudentId?: number;
+  name: string;
+  email: string;
 }
-console.log("User found, checking password...");
-  return { token, user };
-  
-}
 
-export async function verifyToken(token: string) {
+export async function getUser(): Promise<User | null> {
+  const token = (await cookies()).get('token')?.value;
+  if (!token) return null;
+
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: number; role: string };
-    
-  } catch {
-    throw new Error("Invalid token");
-  }
-}
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { id: number; role: string };
 
-export async function hashPassword(password: string) {
-  return bcrypt.hash(password, 10);
+    // Fetch additional user data
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: {
+        id: true,
+        role: true,
+        name: true,
+        email: true,
+        semesterId: true,
+        semesterAsStudentId: true,
+      },
+    });
+
+    if (!user || user.role !== payload.role) return null;
+
+    return user as User;
+  } catch {
+    return null;
+  }
 }

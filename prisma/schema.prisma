@@ -39,7 +39,7 @@ model Department {
   id       Int       @id @default(autoincrement())
   name     String
   lat      Float
-  lon      Float
+  lng      Float
   subjects Subject[]
   teachers User[]    @relation("DeptTeachers")
   students User[]    @relation("DeptStudents")
@@ -61,8 +61,8 @@ model Subject {
   departmentId Int
   semester     Semester?           @relation(fields: [semesterId], references: [id])
   semesterId   Int?
-  teacher      User                @relation("TeacherSubjects", fields: [teacherId], references: [id])
-  teacherId    Int
+  teacher      User?                @relation("TeacherSubjects", fields: [teacherId], references: [id])
+  teacherId    Int?
   sessions     AttendanceSession[]
 }
 

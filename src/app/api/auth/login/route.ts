@@ -1,21 +1,44 @@
-import { NextResponse } from "next/server";
-import { login } from "~/lib/auth";
-import { cookies } from "next/headers";
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { prisma } from '~/server/db';
 
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
 
-export async function POST(request: Request) {
-  try {
-    const { email, password } = await request.json();
-    const { token, user } = await login(email, password);
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-    cookies().set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
-
-    return NextResponse.json({ token, user });
-  } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
+
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) {
+    return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET!,
+    { expiresIn: '1d' }
+  );
+
+  const response = NextResponse.json({
+    message: 'Login successful',
+    user: {
+      id: user.id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
+    },
+  });
+
+  response.cookies.set('token', token, {
+    httpOnly: true,
+    maxAge: 86400, // 1 day
+  });
+
+  return response;
 }

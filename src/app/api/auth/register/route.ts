@@ -1,21 +1,38 @@
-import { NextResponse } from "next/server";
-import { db } from "~/server/db";
-import { hashPassword } from "~/lib/auth";
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { prisma } from '~/server/db';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
+  const { name, email, password, role, departmentId, semesterId } = await req.json();
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   try {
-    const { name, email, password } = await request.json();
-    const hashedPassword = await hashPassword(password);
-    const user = await db.user.create({
+    const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: "STUDENT",
+        role,
+        departmentId,
+        semesterId,
       },
     });
-    return NextResponse.json(user);
-  } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+
+    return NextResponse.json({ message: 'User created', user });
+
+  }   // ✅ Type guard: check if it's a Prisma error
+     catch (error) {
+      console.error("Registration error details:", error);
+      if (typeof error === "object" && error !== null && "code" in error && (error as any).code === "P2002") {
+        return NextResponse.json(
+          { error: "User with this email already exists" },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json({ error: "Registration failed" }, { status: 500 });
+    }
+
+
   }
-}
