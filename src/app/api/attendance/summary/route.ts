@@ -1,9 +1,9 @@
 // app/api/attendance/summary/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
-import type { getUser, User } from '~/lib/auth';
+import type { User } from '~/lib/auth';
+import { getUser } from '~/lib/auth';
 
-// Match StudentDashboard's interface
 interface AttendanceSummary {
   subjectId: string;
   subject: { id: string; name: string };
@@ -11,34 +11,39 @@ interface AttendanceSummary {
   attendedClasses: number;
 }
 
-// Define groupBy output type
-interface AttendanceRecordGroupBy {
-  subjectId: number;
-  _count: { id: number };
-}
-
 export async function GET() {
   try {
-    const user: User | null = await getUser(); // Fix: Use await
+    const user: User | null = await getUser();
     if (!user || user.role !== 'STUDENT') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Use semesterAsStudentId for students, fallback to semesterId
     const effectiveSemesterId = user.semesterAsStudentId ?? user.semesterId;
     if (!effectiveSemesterId) {
       return NextResponse.json({ error: 'Student not assigned to a semester' }, { status: 400 });
     }
 
-    // Fetch attendance records grouped by subjectId
-    const records: AttendanceRecordGroupBy[] = await prisma.attendanceRecord.groupBy({
-      by: ['subjectId'],
+    // Fetch attendance records with session details
+    const attendanceRecords = await prisma.attendanceRecord.findMany({
       where: {
         studentId: user.id,
-        checkInTime: { not: null }, // Ensure only checked-in records
+        checkInTime: { not: null },
       },
-      _count: { id: true },
+      select: {
+        session: {
+          select: {
+            subjectId: true,
+          },
+        },
+      },
     });
+
+    // Count records per subject
+    const recordCounts = attendanceRecords.reduce((acc, record) => {
+      const subjectId = record.session.subjectId;
+      acc[subjectId] = (acc[subjectId] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
 
     // Fetch subjects for the student's semester
     const subjects = await prisma.subject.findMany({
@@ -47,25 +52,22 @@ export async function GET() {
         id: true,
         name: true,
         sessions: {
-          where: { expiresAt: { lte: new Date() } }, // Only non-expired sessions
+          where: { expiresAt: { lte: new Date() } },
           select: { id: true },
         },
       },
     });
 
-    // Generate summary with string IDs
-    const summary: AttendanceSummary[] = subjects.map((subject) => {
-      const record = records.find((r) => r.subjectId === subject.id); // Fix: Explicit find
-      return {
-        subjectId: String(subject.id), // Cast to string
-        subject: {
-          id: String(subject.id),
-          name: subject.name,
-        },
-        totalClasses: subject.sessions.length,
-        attendedClasses: record ? record._count.id : 0, // Fix: Safe access
-      };
-    });
+    // Generate summary
+    const summary: AttendanceSummary[] = subjects.map((subject) => ({
+      subjectId: String(subject.id),
+      subject: {
+        id: String(subject.id),
+        name: subject.name,
+      },
+      totalClasses: subject.sessions.length,
+      attendedClasses: recordCounts[subject.id] || 0,
+    }));
 
     return NextResponse.json(summary);
   } catch (error) {
