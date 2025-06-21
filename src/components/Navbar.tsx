@@ -15,7 +15,7 @@ export function Navbar() {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          GeoAttend
+          Proxy0
         </Typography>
         <Button color="inherit" onClick={handleLogout}>
           Logout

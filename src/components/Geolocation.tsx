@@ -12,6 +12,7 @@ interface GeolocationProps {
 export default function Geolocation({ onLocationChange }: GeolocationProps) {
   const [error, setIsError] = useState<string | null>(null);
   const [departmentCoords, setDepartmentCoords] = useState<{ lat: number; lng: number } | null>(null);
+  
 
   useEffect(() => {
     // Fetch department coordinates
@@ -47,6 +48,10 @@ export default function Geolocation({ onLocationChange }: GeolocationProps) {
           return;
         }
         const distance = calculateDistance(latitude, longitude, departmentCoords.lat, departmentCoords.lng);
+          console.log("🧭 User Location:", latitude, longitude);
+      console.log("🏫 Department Location:", departmentCoords);
+      console.log("📏 Distance:", distance, "meters");
+
         onLocationChange(distance <= 200, latitude, longitude); // 200m radius
       },
       (err) => {

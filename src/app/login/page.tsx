@@ -89,7 +89,7 @@ export default function HomePage() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, p: 4, boxShadow: 4, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
         <Typography variant="h4" align="center" gutterBottom>
-          Welcome to GeoAttend
+          Welcome to Proxy0
         </Typography>
 
         {/* Step 1: Choose Login or Register */}
