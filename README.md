@@ -1,89 +1,29 @@
-# 📍 GeoAttend – Geolocation-Based Attendance Tracking System
+# Create T3 App
 
-A full-stack, role-based attendance tracking web app designed for educational or corporate use, enabling secure and efficient attendance marking via **geolocation**, **dynamic attendance codes**, and **manual override by teachers**, with built-in **VPN prevention** mechanisms.
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-> Developed for Smart India Hackathon 2025  
-> Problem Statement ID: 1707  
-> Problem Statement Title: Development of a Geolocation-Based Attendance Tracking Application  
+## What's next? How do I make an app with this?
 
----
+We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-## ⚙️ Tech Stack
+If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-| Layer       | Technology                 |
-|-------------|----------------------------|
-| Frontend    | Next.js (App Router) + TypeScript + TailwindCSS |
-| Backend     | Next.js API Routes (Node.js) |
-| ORM         | Prisma                      |
-| Database    | PostgreSQL (with PostGIS support optional) |
-| Auth        | JWT + bcrypt                |
-| Hosting     | Vercel (Frontend + Backend), Supabase/Neon/PostgreSQL (Database) |
-| Geolocation | HTML5 Geolocation API + Haversine Formula |
-| VPN Check   | `ipapi.co` (free IP geolocation API) |
+- [Next.js](https://nextjs.org)
+- [NextAuth.js](https://next-auth.js.org)
+- [Prisma](https://prisma.io)
+- [Drizzle](https://orm.drizzle.team)
+- [Tailwind CSS](https://tailwindcss.com)
+- [tRPC](https://trpc.io)
 
----
+## Learn More
 
-## ✅ Features
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-### 🔐 Role-Based Login System (via Email)
-- Email-based login system using JWT.
-- Role is assigned automatically during registration or via admin setup.
-- Users are redirected to role-specific dashboards:
-  - **Admin**
-  - **Teacher**
-  - **Student**
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
----
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
-### 📍 Geolocation-Based Attendance
-- Users are automatically **checked in or out** when entering or leaving a **200-meter radius geofence** around the registered location.
-- Haversine formula used to calculate user proximity to the office/class location.
-- Logs check-in/check-out time and GPS coordinates.
-- VPN and location spoof detection via IP location mismatch.
+## How do I deploy this?
 
----
-
-### 🚫 VPN Prevention
-- Public IP is retrieved using `ipapi.co` or similar services.
-- If a VPN or proxy is detected, the user is blocked from using the system.
-- Geolocation and IP location mismatches are flagged.
-
----
-
-### 👩‍🏫 Teacher Features
-- **Dropdown filters** for:
-  - Department
-  - Semester
-  - Subject (assigned to that teacher)
-- **Generate Attendance Code**:
-  - Random alphanumeric code (e.g., `A7B2C3`)
-  - Valid for a short duration (e.g., 10 mins)
-- **View Attendance Logs** by subject:
-  - View present/absent students
-  - Check code used, timestamp, location
-- **Modify Attendance**:
-  - Add/Remove/Update logs manually
-  - Mark students as present for missed sessions
-
----
-
-### 👨‍🎓 Student Features
-- **Mark Attendance**:
-  - Enter teacher-generated code
-  - Must be physically within the geofenced area
-- **Attendance Summary Dashboard**:
-  - Subject-wise attendance
-  - Total classes vs attended
-  - Attendance percentage (%)
-
----
-
-### 👨‍💼 Admin Features
-- Add/edit users (students, teachers)
-- Assign roles and departments
-- Manage subjects
-- View system-wide attendance data
-- Export logs (CSV support optional)
-
----
-
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
