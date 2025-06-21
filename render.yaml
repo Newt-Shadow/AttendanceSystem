@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: proxyO
+    env: node
+    plan: free
+    buildCommand: pnpm build
+    startCommand: pnpm start
+    nodeVersion: 22.16.0
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PNPM_FLAGS
+        value: --shamefully-hoist
+      - key: DATABASE_URL
+        sync: false # Set in Render dashboard
+      - key: JWT_SECRET
+        sync: false # Set in Render dashboard
