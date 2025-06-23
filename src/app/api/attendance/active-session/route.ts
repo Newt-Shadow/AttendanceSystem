@@ -3,9 +3,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
 import { getUser } from '~/lib/auth';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const user = await getUser();
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user = await getUser(token);
     if (!user || user.role !== 'STUDENT') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

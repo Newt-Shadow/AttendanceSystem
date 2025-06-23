@@ -1,3 +1,4 @@
+// app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -25,8 +26,9 @@ export async function POST(req: Request) {
     { expiresIn: '1d' }
   );
 
-  const response = NextResponse.json({
+  return NextResponse.json({
     message: 'Login successful',
+    token, // Send token in response body
     user: {
       id: user.id,
       role: user.role,
@@ -34,11 +36,4 @@ export async function POST(req: Request) {
       email: user.email,
     },
   });
-
-  response.cookies.set('token', token, {
-    httpOnly: true,
-    maxAge: 86400, // 1 day
-  });
-
-  return response;
 }

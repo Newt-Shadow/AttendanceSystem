@@ -1,8 +1,8 @@
 // app/api/attendance/summary/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
-import type { User } from '~/lib/auth';
 import { getUser } from '~/lib/auth';
+import type { User } from '~/lib/auth';
 
 interface AttendanceSummary {
   subjectId: string;
@@ -11,16 +11,36 @@ interface AttendanceSummary {
   attendedClasses: number;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const user: User | null = await getUser();
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user: User | null = await getUser(token);
     if (!user || user.role !== 'STUDENT') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const effectiveSemesterId = user.semesterAsStudentId ?? user.semesterId;
-    if (!effectiveSemesterId) {
-      return NextResponse.json({ error: 'Student not assigned to a semester' }, { status: 400 });
+    const effectiveDepartmentId = user.departmentAsStudentId;
+    if (!effectiveDepartmentId) {
+      return NextResponse.json({ error: 'Student not assigned to a department' }, { status: 400 });
+    }
+
+    // Get semesterId from query parameter or fall back to user's semesterAsStudentId
+    const { searchParams } = new URL(req.url);
+    const semesterIdParam = searchParams.get('semesterId');
+    let effectiveSemesterId: number | undefined;
+
+    if (semesterIdParam) {
+      effectiveSemesterId = parseInt(semesterIdParam);
+      // Validate semester exists
+      const semester = await prisma.semester.findUnique({ where: { id: effectiveSemesterId } });
+      if (!semester) {
+        return NextResponse.json({ error: 'Invalid semester ID' }, { status: 400 });
+      }
+    } else {
+      effectiveSemesterId = user.semesterAsStudentId ?? user.semesterId;
+      if (!effectiveSemesterId) {
+        return NextResponse.json({ error: 'Student not assigned to a semester' }, { status: 400 });
+      }
     }
 
     // Fetch attendance records with session details
@@ -28,6 +48,12 @@ export async function GET() {
       where: {
         studentId: user.id,
         checkInTime: { not: null },
+        session: {
+          subject: {
+            semesterId: effectiveSemesterId,
+            departmentId: effectiveDepartmentId,
+          },
+        },
       },
       select: {
         session: {
@@ -45,9 +71,12 @@ export async function GET() {
       return acc;
     }, {} as Record<number, number>);
 
-    // Fetch subjects for the student's semester
+    // Fetch subjects for the student's department and selected semester
     const subjects = await prisma.subject.findMany({
-      where: { semesterId: effectiveSemesterId },
+      where: {
+        semesterId: effectiveSemesterId,
+        departmentId: effectiveDepartmentId,
+      },
       select: {
         id: true,
         name: true,

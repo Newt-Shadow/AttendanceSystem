@@ -1,40 +1,21 @@
-// app/api/auth/me/route.ts
 import { NextResponse } from 'next/server';
-import { prisma } from '~/server/db';
 import { getUser } from '~/lib/auth';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const user = await getUser(); // Add await
+   const authHeader = req.headers.get('authorization');
+    console.log('GET /api/auth/me: Authorization header:', authHeader || 'none');
+    const token = authHeader?.replace('Bearer ', '') || '';
+    console.log('GET /api/auth/me: Extracted token:', token ? token.substring(0, 20) + '...' : 'none');
+    const user = await getUser(token);
+
     if (!user) {
+      console.log('GET /api/auth/me: No user found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        departmentId: true,
-        department: {
-          select: { id: true, name: true, lat: true, lng: true },
-        },
-        semesterId: true,
-        semester: {
-          select: { id: true, name: true },
-        },
-        departmentAsStudentId: true,
-        semesterAsStudentId: true,
-      },
-    });
-
-    if (!userData) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(userData);
+    console.log('GET /api/auth/me: User found:', user.id, user.role);
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error fetching user data:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

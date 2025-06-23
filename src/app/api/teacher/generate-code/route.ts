@@ -1,40 +1,39 @@
+// src/app/api/teacher/generate-code/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
 import { getUser } from '~/lib/auth';
 
 export async function POST(req: Request) {
-  const user = await getUser();
-  if (!user || user.role !== 'TEACHER') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  try {
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user = await getUser(token);
+    if (!user || user.role !== 'TEACHER') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  const { subjectId } = await req.json();
-  // Input validation
-  if (!subjectId || typeof subjectId !== 'number') {
-    return NextResponse.json({ error: 'Invalid subjectId' }, { status: 400 });
-  }
+    const { subjectId } = await req.json();
+    if (!subjectId || typeof subjectId !== 'number') {
+      return NextResponse.json({ error: 'Invalid subjectId' }, { status: 400 });
+    }
 
-  // Verify subject exists
-  const subject = await prisma.subject.findUnique({
-    where: { id: subjectId },
-  });
-  if (!subject) {
-    return NextResponse.json({ error: 'Subject not found' }, { status: 400 });
-  }
-
-  // Generate unique code
-  let isUnique = false;
-  let attempts = 0;
-  const maxAttempts = 5;
-
-  while (!isUnique && attempts < maxAttempts) {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase(); // Declare code inside loop
-    const existingSession = await prisma.attendanceSession.findUnique({
-      where: { code },
+    const subject = await prisma.subject.findUnique({
+      where: { id: subjectId },
     });
-    if (!existingSession) {
-      isUnique = true;
-      try {
+    if (!subject) {
+      return NextResponse.json({ error: 'Subject not found' }, { status: 400 });
+    }
+
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (!isUnique && attempts < maxAttempts) {
+      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const existingSession = await prisma.attendanceSession.findUnique({
+        where: { code },
+      });
+      if (!existingSession) {
+        isUnique = true;
         const session = await prisma.attendanceSession.create({
           data: {
             code,
@@ -54,13 +53,13 @@ export async function POST(req: Request) {
             teacherId: session.teacherId,
           },
         });
-      } catch (error) {
-        console.error('Create session error:', error);
-        return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
       }
+      attempts++;
     }
-    attempts++;
-  }
 
-  return NextResponse.json({ error: 'Failed to generate unique code' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not generate a unique code' }, { status: 500 });
+  } catch (error) {
+    console.error('Error in POST /api/teacher/generate-code:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
