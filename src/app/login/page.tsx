@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Container, Box, Typography, Button, TextField, MenuItem, Divider,
   FormControl, InputLabel, Select, Alert, useMediaQuery, createTheme, ThemeProvider,
+  CircularProgress,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { login, register, getCurrentUser } from '~/lib/api';
 import { Navbar } from '~/components/Navbar';
 
-// Define light and dark themes matching StudentDashboard
+// Define light and dark themes (unchanged)
 const lightTheme = createTheme({
   palette: {
     mode: 'light',
@@ -149,7 +150,8 @@ const darkTheme = createTheme({
   },
 });
 
-export default function HomePage() {
+// Child component with useSearchParams
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const forceRegister = searchParams.get('register') === 'true';
@@ -590,5 +592,14 @@ export default function HomePage() {
         </Container>
       </Box>
     </ThemeProvider>
+  );
+}
+
+// Main page component with Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<CircularProgress sx={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />}>
+      <LoginContent />
+    </Suspense>
   );
 }
