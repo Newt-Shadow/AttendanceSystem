@@ -24,7 +24,6 @@ model User {
   departmentId          Int?
   semester              Semester?           @relation("UserSemester", fields: [semesterId], references: [id])
   semesterId            Int?
-  teachingSubjects      Subject[]           @relation("TeacherSubjects")
   attendanceRecords     AttendanceRecord[]  @relation("StudentAttendance")
   departmentAsTeacher   Department?         @relation("DeptTeachers", fields: [departmentAsTeacherId], references: [id])
   departmentAsTeacherId Int?
@@ -61,8 +60,6 @@ model Subject {
   departmentId Int
   semester     Semester?           @relation(fields: [semesterId], references: [id])
   semesterId   Int?
-  teacher      User?                @relation("TeacherSubjects", fields: [teacherId], references: [id])
-  teacherId    Int?
   sessions     AttendanceSession[]
 }
 
@@ -89,4 +86,6 @@ model AttendanceRecord {
   method       String
   lat          Float?
   lng          Float?
+
+  @@unique([studentId, sessionId]) 
 }
