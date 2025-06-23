@@ -38,7 +38,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import SchoolIcon from '@mui/icons-material/School';
-import { SvgIconComponent } from '@mui/icons-material';
+import type { SvgIconComponent } from '@mui/icons-material';
 
 interface AttendanceSummary {
   subjectId: string;
@@ -593,7 +593,7 @@ export default function StudentDashboard() {
                   attendanceSummary.map((summary) => {
                     const IconComponent = subjectIconMap[getSubjectIcon(summary.subject.name)] || SchoolIcon;
                     return (
-                      <Grid component="div" item xs={12} sm={6} md={4} key={summary.subjectId}>
+                      <Grid component="div" size={{ xs: 12 ,sm:6, md:4}} key={summary.subjectId}>
                         <motion.div whileHover={{ scale: 1.04 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
                           <Card
                             sx={{
@@ -661,7 +661,7 @@ export default function StudentDashboard() {
                     );
                   })
                 ) : (
-                  <Grid component="div" item xs={12}>
+                  <Grid component="div" size={{ xs: 12 }}>
                     <Typography color="text.secondary" align="center" sx={{ py: 6, fontStyle: 'italic', fontSize: '1.2rem' }}>
                       No subjects found for the selected semester
                     </Typography>

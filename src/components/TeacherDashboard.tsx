@@ -35,7 +35,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import SchoolIcon from '@mui/icons-material/School';
-import { SvgIconComponent } from '@mui/icons-material';
+import type { SvgIconComponent } from '@mui/icons-material';
 
 interface Subject {
   id: number;

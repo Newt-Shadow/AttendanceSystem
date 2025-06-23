@@ -910,7 +910,7 @@ export default function AdminDashboard() {
               </Typography>
               <Box sx={{ mb: 4 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="user-role-select-label">Role</InputLabel>
                       <Select
@@ -926,7 +926,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="user-department-select-label">Department</InputLabel>
                       <Select
@@ -942,7 +942,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="user-semester-select-label">Semester</InputLabel>
                       <Select
@@ -958,7 +958,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <Box sx={{ mt: 2 }}>
                       <Button
                         variant="contained"
@@ -1157,7 +1157,7 @@ export default function AdminDashboard() {
               </Typography>
               <Box sx={{ mb: 4 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="subject-filter-department-select-label">Department</InputLabel>
                       <Select
@@ -1173,7 +1173,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="subject-filter-semester-select-label">Semester</InputLabel>
                       <Select
@@ -1189,7 +1189,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <Box sx={{ mt: 2 }}>
                       <Button
                         variant="contained"
@@ -1332,7 +1332,7 @@ export default function AdminDashboard() {
                   Attendance Filters
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="attendance-department-select-label">Department</InputLabel>
                       <Select
@@ -1348,7 +1348,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="attendance-semester-select-label">Semester</InputLabel>
                       <Select
@@ -1364,7 +1364,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="attendance-subject-select-label">Subject</InputLabel>
                       <Select
@@ -1385,7 +1385,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="attendance-user-select-label">Student</InputLabel>
                       <Select
@@ -1403,7 +1403,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <Box sx={{ mt: 2 }}>
                       <Button
                         variant="contained"
@@ -1517,7 +1517,7 @@ export default function AdminDashboard() {
                   Statistics Filters
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="stats-department-select-label">Department</InputLabel>
                       <Select
@@ -1533,7 +1533,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="stats-semester-select-label">Semester</InputLabel>
                       <Select
@@ -1549,7 +1549,7 @@ export default function AdminDashboard() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm:3}}>
                     <Box sx={{ mt: 2 }}>
                       <Button
                         variant="contained"
