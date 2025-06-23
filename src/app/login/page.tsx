@@ -1,7 +1,6 @@
-// src/app/page.tsx
 'use client';
 
-import { useEffect, useState, useCallback , useMemo} from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Container, Box, Typography, Button, TextField, MenuItem, Divider,
@@ -253,6 +252,19 @@ export default function HomePage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    // Validate required fields
+    if (!name || !email || !password) {
+      setError('Please fill in all required fields');
+      return;
+    }
+    if (role !== 'ADMIN' && !departmentId) {
+      setError('Department is required for Students and Teachers');
+      return;
+    }
+    if (role === 'STUDENT' && !semesterId) {
+      setError('Semester is required for Students');
+      return;
+    }
     try {
       const user = await register(
         name,
@@ -481,14 +493,19 @@ export default function HomePage() {
                         <MenuItem value="ADMIN">Admin</MenuItem>
                       </Select>
                     </FormControl>
-                    <FormControl fullWidth margin="normal" required>
-                      <InputLabel id="department-select-label">Department</InputLabel>
+                    <FormControl fullWidth margin="normal" required={role !== 'ADMIN'}>
+                      <InputLabel id="department-select-label">
+                        {role === 'ADMIN' ? 'Department (Optional)' : 'Department'}
+                      </InputLabel>
                       <Select
                         labelId="department-select-label"
                         value={departmentId}
-                        label="Department"
+                        label={role === 'ADMIN' ? 'Department (Optional)' : 'Department'}
                         onChange={(e) => setDepartmentId(e.target.value)}
                       >
+                        <MenuItem value="">
+                          {role === 'ADMIN' ? 'None (Optional)' : 'Select Department'}
+                        </MenuItem>
                         {departments.map((dep) => (
                           <MenuItem key={dep.id} value={dep.id}>
                             {dep.name}
@@ -505,6 +522,7 @@ export default function HomePage() {
                           label="Semester"
                           onChange={(e) => setSemesterId(e.target.value)}
                         >
+                          <MenuItem value="">Select Semester</MenuItem>
                           {semesters.map((sem) => (
                             <MenuItem key={sem.id} value={sem.id}>
                               {sem.name}
@@ -536,9 +554,9 @@ export default function HomePage() {
                     <AnimatePresence>
                       {error && (
                         <motion.div
-                          initial={{ opacity: 0, y: 30 }}
+                          initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -30 }}
+                          exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.5 }}
                         >
                           <Alert severity="error" sx={{ mt: 3, borderRadius: '16px' }}>
@@ -549,7 +567,7 @@ export default function HomePage() {
                     </AnimatePresence>
                     <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
                       <motion.div whileHover={{ scale: 1.05 }}>
-                        <Button type="submit" variant="contained" color="primary" sx={{ px: 6, py: 2 }}>
+                        <Button type="submit" variant="contained" color="primary" sx={{ px: 4, py: 2 }}>
                           Register
                         </Button>
                       </motion.div>
@@ -558,9 +576,9 @@ export default function HomePage() {
                           variant="outlined"
                           color="secondary"
                           onClick={() => setView('choose')}
-                          sx={{ px: 6, py: 2 }}
+                          sx={{ px: 4, py: 2 }}
                         >
-                          Back
+                          Cancel
                         </Button>
                       </motion.div>
                     </Box>

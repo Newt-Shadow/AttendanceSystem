@@ -152,3 +152,61 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'Failed to delete subject' }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user = await getUser(token);
+    if (!user || user.role !== 'ADMIN') {
+      console.log('Subjects PUT: Unauthorized user:', user ? user.role : 'no user');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id, name } = await req.json();
+
+    // Input validation
+    if (!id || typeof id !== 'number' || !name || typeof name !== 'string') {
+      console.log('Subjects PUT: Invalid input:', { id, name });
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+    }
+
+    // Validate subject existence
+    const subject = await prisma.subject.findUnique({ where: { id } });
+    if (!subject) {
+      console.log('Subjects PUT: Subject not found:', id);
+      return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
+    }
+
+    // Check for duplicate subject name in the same department
+    const existingSubject = await prisma.subject.findFirst({
+      where: {
+        name,
+        departmentId: subject.departmentId,
+        NOT: { id },
+      },
+    });
+    if (existingSubject) {
+      console.log('Subjects PUT: Subject name already exists in this department:', name);
+      return NextResponse.json({ error: 'Subject name already exists in this department' }, { status: 400 });
+    }
+
+    const updatedSubject = await prisma.subject.update({
+      where: { id },
+      data: { name },
+      include: {
+        department: { select: { id: true, name: true } },
+        semester: { select: { id: true, name: true } },
+        teacher: { select: { id: true, name: true } },
+      },
+    });
+
+    console.log('Subjects PUT: Subject updated:', updatedSubject);
+    return NextResponse.json({ message: 'Subject updated', subject: updatedSubject });
+  } catch (error) {
+    console.error('Subjects PUT: Error updating subject:', error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'Subject name already exists in this department' }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'Failed to update subject' }, { status: 500 });
+  }
+}
