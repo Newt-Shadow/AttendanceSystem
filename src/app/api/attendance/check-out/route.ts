@@ -1,3 +1,4 @@
+// app/api/attendance/check-out/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
 import { getUser } from '~/lib/auth';
@@ -5,7 +6,8 @@ import { checkVPN } from '~/lib/vpnCheck';
 import { calculateDistance } from '~/lib/haversine';
 
 export async function POST(req: Request) {
-  const user = await getUser(); // Fix: Await getUser
+  const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+  const user = await getUser(token);
   if (!user || user.role !== 'STUDENT') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
   }
 
   const session = await prisma.attendanceSession.findUnique({
-    where: { id: sessionId }, // Fix: Use 'id' field (adjust if sessionId is different)
+    where: { id: sessionId },
     include: { subject: { include: { department: true } } },
   });
 
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
   }
 
   const distance = calculateDistance(lat, lng, session.subject.department.lat, session.subject.department.lng);
-  if (distance <= 200) {
+  if (distance <= 20000000000) {
     return NextResponse.json({ error: 'Still within geofence. Check-out requires leaving the area.' }, { status: 400 });
   }
 

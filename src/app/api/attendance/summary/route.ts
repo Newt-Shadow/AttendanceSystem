@@ -1,7 +1,8 @@
+// app/api/attendance/summary/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '~/server/db';
-import type { User } from '~/lib/auth';
 import { getUser } from '~/lib/auth';
+import type { User } from '~/lib/auth';
 
 interface AttendanceSummary {
   subjectId: string;
@@ -12,7 +13,8 @@ interface AttendanceSummary {
 
 export async function GET(req: Request) {
   try {
-    const user: User | null = await getUser();
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user: User | null = await getUser(token);
     if (!user || user.role !== 'STUDENT') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

@@ -1,6 +1,5 @@
 // src/lib/auth.ts
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -18,10 +17,9 @@ export interface User {
   semesterAsStudentId?: number;
 }
 
-export async function getUser(): Promise<User | null> {
-  const token = (await cookies()).get('token')?.value;
+export async function getUser(token: string): Promise<User | null> {
   if (!token) {
-    console.log('No token found in cookies');
+    console.log('No token provided');
     return null;
   }
 
@@ -54,7 +52,6 @@ export async function getUser(): Promise<User | null> {
       return null;
     }
 
-    // console.log('User fetched:', user);
     return user as User;
   } catch (error) {
     console.error('Error verifying token or fetching user:', error);

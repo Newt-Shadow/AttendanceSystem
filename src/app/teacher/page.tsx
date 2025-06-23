@@ -1,8 +1,8 @@
-// app/teacher/dashboard/page.tsx
-import ProtectedPage from '~/app/protected-page';
+// app/teacher/page.tsx
+import ProtectedPage  from '~/app/protected-page';
 import TeacherDashboard from '~/components/TeacherDashboard';
 
-export default function TeacherDashboardPage() {
+export default function TeacherPage() {
   return (
     <ProtectedPage allowedRoles={['TEACHER']}>
       <TeacherDashboard />

@@ -5,7 +5,8 @@ import { getUser } from '~/lib/auth';
 
 export async function POST(req: Request) {
   try {
-    const user = await getUser();
+    const token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    const user = await getUser(token);
     if (!user || user.role !== 'TEACHER') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
